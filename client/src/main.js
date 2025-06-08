@@ -99,14 +99,13 @@ class PongGame {
         centerLineMaterial.diffuseColor = new Color3(1, 1, 1);
         centerLine.material = centerLineMaterial;
         
-        // Create field outline
-        const fieldOutline = MeshBuilder.CreateGround("fieldOutline", {width: fieldWidth + 1, height: fieldHeight + 1}, this.scene);
+        // Create 3D field outline
+        const fieldOutline = MeshBuilder.CreateBox("fieldOutline", {width: fieldWidth + 1, height: fieldHeight + 1, depth: 2}, this.scene);
         const outlineMaterial = new StandardMaterial("outlineMaterial", this.scene);
         outlineMaterial.diffuseColor = new Color3(0.1, 0.1, 0.1);
-        outlineMaterial.wireframe = true;
+        outlineMaterial.alpha = 0.3;
         fieldOutline.material = outlineMaterial;
         fieldOutline.position.y = 0;
-        fieldOutline.rotation.x = Math.PI / 2;
     }
     
     createPaddles() {
