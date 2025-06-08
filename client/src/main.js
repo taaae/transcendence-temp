@@ -51,17 +51,20 @@ class PongGame {
     async createScene() {
         this.scene = new Scene(this.engine);
         
-        // Create camera (orthographic for 2D game feel)
-        this.camera = new ArcRotateCamera("camera", Math.PI / 2, Math.PI / 2, 50, Vector3.Zero(), this.scene);
+        // Create camera for 3D perspective
+        this.camera = new ArcRotateCamera("camera", -Math.PI / 4, Math.PI / 3, 60, Vector3.Zero(), this.scene);
         this.camera.setTarget(Vector3.Zero());
-        // this.camera.attachControls(this.canvas, false); // Disable default controls
+        this.camera.attachControl(this.canvas, true);
         
-        // Lock camera for 2D gameplay
-        this.camera.inputs.clear();
+        // Set camera limits to maintain good viewing angle
+        this.camera.lowerBetaLimit = Math.PI / 6;
+        this.camera.upperBetaLimit = Math.PI / 2;
+        this.camera.lowerRadiusLimit = 40;
+        this.camera.upperRadiusLimit = 80;
         
-        // Create lighting
+        // Create lighting for better 3D appearance
         const light = new HemisphericLight("light", new Vector3(0, 1, 0), this.scene);
-        light.intensity = 0.7;
+        light.intensity = 0.8;
         
         // Create game field boundaries
         this.createGameField();
@@ -107,32 +110,39 @@ class PongGame {
     }
     
     createPaddles() {
-        // Create paddle 1 (left)
-        this.paddle1 = MeshBuilder.CreateBox("paddle1", {width: 1, height: 6, depth: 1}, this.scene);
+        // Create paddle 1 (left) with 3D depth
+        this.paddle1 = MeshBuilder.CreateBox("paddle1", {width: 1.5, height: 6, depth: 0.8}, this.scene);
         this.paddle1.position.x = -18;
         this.paddle1.position.y = 0;
         
         const paddle1Material = new StandardMaterial("paddle1Material", this.scene);
         paddle1Material.diffuseColor = new Color3(0, 1, 0); // Green
+        paddle1Material.specularColor = new Color3(0.2, 0.2, 0.2);
+        paddle1Material.roughness = 0.3;
         this.paddle1.material = paddle1Material;
         
-        // Create paddle 2 (right)
-        this.paddle2 = MeshBuilder.CreateBox("paddle2", {width: 1, height: 6, depth: 1}, this.scene);
+        // Create paddle 2 (right) with 3D depth
+        this.paddle2 = MeshBuilder.CreateBox("paddle2", {width: 1.5, height: 6, depth: 0.8}, this.scene);
         this.paddle2.position.x = 18;
         this.paddle2.position.y = 0;
         
         const paddle2Material = new StandardMaterial("paddle2Material", this.scene);
         paddle2Material.diffuseColor = new Color3(0, 0, 1); // Blue
+        paddle2Material.specularColor = new Color3(0.2, 0.2, 0.2);
+        paddle2Material.roughness = 0.3;
         this.paddle2.material = paddle2Material;
     }
     
     createBall() {
-        this.ball = MeshBuilder.CreateSphere("ball", {diameter: 1}, this.scene);
+        this.ball = MeshBuilder.CreateSphere("ball", {diameter: 1.2, segments: 16}, this.scene);
         this.ball.position.x = 0;
         this.ball.position.y = 0;
         
         const ballMaterial = new StandardMaterial("ballMaterial", this.scene);
         ballMaterial.diffuseColor = new Color3(1, 1, 1); // White
+        ballMaterial.specularColor = new Color3(0.8, 0.8, 0.8);
+        ballMaterial.roughness = 0.1;
+        ballMaterial.emissiveColor = new Color3(0.1, 0.1, 0.1);
         this.ball.material = ballMaterial;
     }
     
