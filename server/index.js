@@ -1,20 +1,26 @@
-const express = require('express');
-const http = require('http');
+const fastify = require('fastify')({ logger: true });
 const socketIo = require('socket.io');
-const cors = require('cors');
 const path = require('path');
 
-const app = express();
-const server = http.createServer(app);
-const io = socketIo(server, {
+// Register CORS plugin
+fastify.register(require('@fastify/cors'), {
+  origin: "*",
+  methods: ["GET", "POST"]
+});
+
+// Register static files plugin
+fastify.register(require('@fastify/static'), {
+  root: path.join(__dirname, '../client/dist'),
+  prefix: '/'
+});
+
+// Initialize Socket.io with Fastify
+const io = socketIo(fastify.server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"]
   }
 });
-
-app.use(cors());
-app.use(express.static(path.join(__dirname, '../client/dist')));
 
 // Game state
 const gameState = {
@@ -233,6 +239,16 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => {
-  console.log(`Game server running on port ${PORT}`);
-}); 
+
+// Start the Fastify server
+const start = async () => {
+  try {
+    await fastify.listen({ port: PORT, host: '0.0.0.0' });
+    console.log(`Game server running on port ${PORT}`);
+  } catch (err) {
+    fastify.log.error(err);
+    process.exit(1);
+  }
+};
+
+start(); 
